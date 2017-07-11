@@ -8,12 +8,12 @@ class foreman_proxy::proxydhcp {
     fail("Could not get the ip address from fact ipaddress_${interface_fact_name}")
   }
 
-  $net  = pick($::foreman_proxy::dhcp_network, inline_template("<%= scope.lookupvar('::network_${interface_fact_name}') %>")
+  $net  = pick($::foreman_proxy::dhcp_network, inline_template("<%= scope.lookupvar('::network_${interface_fact_name}') %>"))
   if ! is_ip_address($net) {
     fail("Could not get the network address from fact network_${interface_fact_name}")
   }
 
-  $mask = pick($::foreman_proxy::dhcp_netmask,inline_template("<%= scope.lookupvar('::netmask_${interface_fact_name}') %>")
+  $mask = pick($::foreman_proxy::dhcp_netmask,inline_template("<%= scope.lookupvar('::netmask_${interface_fact_name}') %>"))
   if ! is_ip_address($mask) {
     fail("Could not get the network mask from fact netmask_${interface_fact_name}")
   }
