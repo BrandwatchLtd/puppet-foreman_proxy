@@ -456,6 +456,8 @@ class foreman_proxy (
   $dhcp_gateway               = $foreman_proxy::params::dhcp_gateway,
   $dhcp_range                 = $foreman_proxy::params::dhcp_range,
   $dhcp_pxeserver             = $foreman_proxy::params::dhcp_pxeserver,
+  $dhcp_network               = $foreman_proxy::params::dhcp_network,
+  $dhcp_netmask               = $foreman_proxy::params::dhcp_netmask,
   $dhcp_nameservers           = $foreman_proxy::params::dhcp_nameservers,
   $dhcp_server                = $foreman_proxy::params::dhcp_server,
   $dhcp_config                = $foreman_proxy::params::dhcp_config,
