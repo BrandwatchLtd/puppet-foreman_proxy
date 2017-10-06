@@ -6,10 +6,8 @@
 # == Parameters
 #
 # $module::        Whether the config file is a proxy module or not
-#                  type:boolean
 #
 # $enabled::       If module is enabled or not
-#                  type:boolean
 #
 # $listen_on::     Whether the module listens on https, http, or both
 #
@@ -24,19 +22,20 @@
 #
 # $mode:           Settings file's mode
 #
+# $feature::       Feature name advertised by proxy module
+#                  If set, foreman_proxy::register will validate the feature name is loaded and advertised.
+#
 define foreman_proxy::settings_file (
-  $module        = true,
-  $enabled       = true,
-  $listen_on     = 'https',
-  $path          = "${::foreman_proxy::etc}/foreman-proxy/settings.d/${title}.yml",
-  $owner         = 'root',
-  $group         = $::foreman_proxy::user,
-  $mode          = '0640',
-  $template_path = "foreman_proxy/${title}.yml.erb",
+  Boolean $module = true,
+  Boolean $enabled = true,
+  Foreman_proxy::ListenOn $listen_on = 'https',
+  Stdlib::Absolutepath $path = "${::foreman_proxy::etc}/foreman-proxy/settings.d/${title}.yml",
+  String $owner = 'root',
+  String $group = $::foreman_proxy::user,
+  String $mode = '0640',
+  String $template_path = "foreman_proxy/${title}.yml.erb",
+  Optional[String] $feature = undef,
 ) {
-  validate_bool($module, $enabled)
-  validate_listen_on($listen_on)
-
   # If the config file is for a proxy module, then we need to know
   # whether it's enabled, and if so, where to listen (https, http, or both).
   # If undefined here, look up the values from the foreman_proxy class.
@@ -48,6 +47,10 @@ define foreman_proxy::settings_file (
         'https' => 'https',
         'http'  => 'http',
         default => false,
+      }
+
+      if $feature {
+        foreman_proxy::feature { $feature: }
       }
     } else {
       $module_enabled = false

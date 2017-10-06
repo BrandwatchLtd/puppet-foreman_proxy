@@ -3,13 +3,13 @@
 
 source 'https://rubygems.org'
 
-gem 'puppet', ENV.key?('PUPPET_VERSION') ? "~> #{ENV['PUPPET_VERSION']}" : '>= 3.5'
+gem 'puppet', ENV.key?('PUPPET_VERSION') ? "~> #{ENV['PUPPET_VERSION']}" : '>= 4.6'
 
 gem 'rake'
 gem 'rspec', '~> 3.0'
 gem 'rspec-puppet', '~> 2.3'
 gem 'rspec-puppet-facts', '>= 1.7'
-gem 'puppetlabs_spec_helper', '= 2.1.0'
+gem 'puppetlabs_spec_helper', '>= 2.1.1'
 gem 'puppet-lint', '>= 2'
 gem 'puppet-lint-unquoted_string-check'
 gem 'puppet-lint-empty_string-check'
@@ -27,8 +27,11 @@ gem 'json', '~> 1.0', {"platforms"=>["ruby_19"], "groups"=>["test"]}
 gem 'json_pure', '~> 1.0', {"platforms"=>["ruby_19"], "groups"=>["test"]}
 gem 'logging', '~> 2.1.0', {"platforms"=>["ruby_19"], "groups"=>["test"]}
 gem 'beaker-rspec', {"groups"=>["system_tests"]}
+gem 'beaker-module_install_helper', {"groups"=>["system_tests"]}
 gem 'beaker-puppet_install_helper', {"groups"=>["system_tests"]}
 gem 'metadata-json-lint'
 gem 'kafo_module_lint'
+gem 'rgen'
+gem 'parallel_tests'
 
 # vim:ft=ruby

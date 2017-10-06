@@ -5,17 +5,17 @@
 # === Parameters:
 #
 # $generate_keys::      Automatically generate SSH keys
-#                       type:boolean
 #
 # $install_key::        Automatically install generated SSH key to root authorized keys
 #                       which allows managing this host through Remote Execution
-#                       type:boolean
 #
 # $ssh_identity_dir::   Directory where SSH keys are stored
 #
 # $ssh_identity_file::  Provide an alternative name for the SSH keys
 #
 # $ssh_keygen::         Location of the ssh-keygen binary
+#
+# $ssh_kerberos_auth::  Enable kerberos authentication for SSH
 #
 # $local_working_dir::  Local working directory on the smart proxy
 #
@@ -24,27 +24,23 @@
 # === Advanced parameters:
 #
 # $enabled::            Enables/disables the plugin
-#                       type:boolean
 #
 # $listen_on::          Proxy feature listens on https, http, or both
 #
 class foreman_proxy::plugin::remote_execution::ssh (
-  $enabled            = $::foreman_proxy::plugin::remote_execution::ssh::params::enabled,
-  $listen_on          = $::foreman_proxy::plugin::remote_execution::ssh::params::listen_on,
-  $generate_keys      = $::foreman_proxy::plugin::remote_execution::ssh::params::generate_keys,
-  $install_key        = $::foreman_proxy::plugin::remote_execution::ssh::params::install_key,
-  $ssh_identity_dir   = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_identity_dir,
-  $ssh_identity_file  = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_identity_file,
-  $ssh_keygen         = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_keygen,
-  $local_working_dir  = $::foreman_proxy::plugin::remote_execution::ssh::params::local_working_dir,
-  $remote_working_dir = $::foreman_proxy::plugin::remote_execution::ssh::params::remote_working_dir,
+  Boolean $enabled = $::foreman_proxy::plugin::remote_execution::ssh::params::enabled,
+  Foreman_proxy::ListenOn $listen_on = $::foreman_proxy::plugin::remote_execution::ssh::params::listen_on,
+  Boolean $generate_keys = $::foreman_proxy::plugin::remote_execution::ssh::params::generate_keys,
+  Boolean $install_key = $::foreman_proxy::plugin::remote_execution::ssh::params::install_key,
+  Stdlib::Absolutepath $ssh_identity_dir = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_identity_dir,
+  String $ssh_identity_file = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_identity_file,
+  String $ssh_keygen = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_keygen,
+  Stdlib::Absolutepath $local_working_dir = $::foreman_proxy::plugin::remote_execution::ssh::params::local_working_dir,
+  Stdlib::Absolutepath $remote_working_dir = $::foreman_proxy::plugin::remote_execution::ssh::params::remote_working_dir,
+  Boolean $ssh_kerberos_auth = $::foreman_proxy::plugin::remote_execution::ssh::params::ssh_kerberos_auth,
 ) inherits foreman_proxy::plugin::remote_execution::ssh::params {
 
   $ssh_identity_path = "${ssh_identity_dir}/${ssh_identity_file}"
-
-  validate_absolute_path($ssh_identity_path, $local_working_dir, $remote_working_dir)
-  validate_bool($enabled, $generate_keys, $install_key)
-  validate_listen_on($listen_on)
 
   include ::foreman_proxy::plugin::dynflow
 
@@ -54,6 +50,22 @@ class foreman_proxy::plugin::remote_execution::ssh (
     enabled       => $enabled,
     listen_on     => $listen_on,
     template_path => 'foreman_proxy/plugin/remote_execution_ssh.yml.erb',
+  }
+
+  if $ssh_kerberos_auth {
+    if $::osfamily == 'RedHat' {
+      $ruby_prefix = $::operatingsystem ? {
+        'Fedora' => 'rubygem',
+        default  => 'tfm-rubygem',
+      }
+    } else {
+      $ruby_prefix = 'ruby'
+    }
+
+    $kerberos_pkg = "${ruby_prefix}-net-ssh-krb"
+    package { $kerberos_pkg:
+      ensure => present,
+    }
   }
 
   if $generate_keys {
@@ -87,6 +99,10 @@ class foreman_proxy::plugin::remote_execution::ssh (
   }
 
   if $::osfamily == 'RedHat' and $::operatingsystem != 'Fedora' {
+    if $ssh_kerberos_auth {
+      Package[$kerberos_pkg]
+        ~> Service['smart_proxy_dynflow_core']
+    }
     Foreman_proxy::Settings_file['remote_execution_ssh']
       ~> Service['smart_proxy_dynflow_core']
   }
