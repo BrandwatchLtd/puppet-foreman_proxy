@@ -19,7 +19,6 @@ class foreman_proxy::params {
 
       $dhcp_config = '/etc/dhcp/dhcpd.conf'
       $dhcp_leases = '/var/lib/dhcpd/dhcpd.leases'
-      $dhcp_manage_acls = true
 
       $keyfile  = '/etc/rndc.key'
       $nsupdate = 'bind-utils'
@@ -46,7 +45,6 @@ class foreman_proxy::params {
 
       $dhcp_config = '/etc/dhcp/dhcpd.conf'
       $dhcp_leases = '/var/lib/dhcp/dhcpd.leases'
-      $dhcp_manage_acls = false
 
       $keyfile  = '/etc/bind/rndc.key'
       $nsupdate = 'dnsutils'
@@ -91,7 +89,6 @@ class foreman_proxy::params {
 
       $dhcp_config = '/usr/local/etc/dhcpd.conf'
       $dhcp_leases = '/var/db/dhcpd/dhcpd.leases'
-      $dhcp_manage_acls = false
 
       $keyfile  = '/usr/local/etc/namedb/rndc.key'
       $nsupdate = 'bind910'
@@ -124,7 +121,6 @@ class foreman_proxy::params {
 
       $dhcp_config = '/etc/dhcpd.conf'
       $dhcp_leases = '/var/lib/dhcp/dhcpd.leases'
-      $dhcp_manage_acls = false
 
       $keyfile  = '/etc/rndc.key'
       $nsupdate = 'bind-tools'
@@ -176,7 +172,7 @@ class foreman_proxy::params {
   # Enable listening on http
   $bind_host = ['*']
   $http      = false
-  $http_port = 8000
+  $http_port = '8000'
 
   # Logging settings
   $log               = '/var/log/foreman-proxy/proxy.log'
@@ -186,7 +182,7 @@ class foreman_proxy::params {
 
   # Enable SSL, ensure proxy is added with "https://" protocol if true
   $ssl      = true
-  $ssl_port = 8443
+  $ssl_port = '8443'
   # If CA is specified, remote Foreman host will be verified
   $ssl_ca = "${ssldir}/certs/ca.pem"
   # Used to communicate to Foreman
@@ -226,8 +222,6 @@ class foreman_proxy::params {
   $puppetca_listen_on = 'https'
   $puppetca_cmd       = "${puppet_cmd} cert"
   $puppet_group       = 'puppet'
-  $autosignfile       = "${puppetdir}/autosign.conf"
-  $use_autosignfile   = false
 
   # The puppet-agent package, (puppet 4 AIO) doesn't create a puppet group
   $manage_puppet_group = versioncmp($::puppetversion, '4.0') > 0
@@ -259,13 +253,12 @@ class foreman_proxy::params {
   $logs_listen_on = 'https'
 
   # TFTP settings - requires optional TFTP puppet module
-  $tftp                   = true
-  $tftp_listen_on         = 'https'
-  $tftp_managed           = true
-  $tftp_manage_wget       = true
-  $tftp_dirs              = ["${tftp_root}/pxelinux.cfg","${tftp_root}/grub","${tftp_root}/grub2","${tftp_root}/boot","${tftp_root}/ztp.cfg","${tftp_root}/poap.cfg"]
-  $tftp_servername        = undef
-  $tftp_replace_grub2_cfg = false
+  $tftp             = true
+  $tftp_listen_on   = 'https'
+  $tftp_managed     = true
+  $tftp_manage_wget = true
+  $tftp_dirs        = ["${tftp_root}/pxelinux.cfg","${tftp_root}/grub","${tftp_root}/grub2","${tftp_root}/boot","${tftp_root}/ztp.cfg","${tftp_root}/poap.cfg"]
+  $tftp_servername  = undef
 
   # DHCP settings - requires optional DHCP puppet module
   $dhcp                    = false
@@ -290,15 +283,6 @@ class foreman_proxy::params {
   $dhcp_key_name   = undef
   $dhcp_key_secret = undef
   $dhcp_omapi_port = 7911
-  $dhcp_node_type = 'standalone'
-  $dhcp_failover_address = $::ipaddress
-  $dhcp_peer_address = undef
-  $dhcp_failover_port = 519
-  $dhcp_max_response_delay = 30
-  $dhcp_max_unacked_updates  = 10
-  $dhcp_mclt  = 300
-  $dhcp_load_split = 255
-  $dhcp_load_balance = 3
 
   # DNS settings - requires optional DNS puppet module
   $dns                    = false
@@ -311,7 +295,7 @@ class foreman_proxy::params {
   $dns_reverse            = undef
   # localhost can resolve to ipv6 which ruby doesn't handle well
   $dns_server             = '127.0.0.1'
-  $dns_ttl                = 86400
+  $dns_ttl                = '86400'
   $dns_tsig_keytab        = "${etc}/foreman-proxy/dns.keytab"
   $dns_tsig_principal     = "foremanproxy/${::fqdn}@${dns_realm}"
 

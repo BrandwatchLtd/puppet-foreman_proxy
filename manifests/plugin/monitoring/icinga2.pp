@@ -6,8 +6,6 @@
 #
 # $server::                Icinga2 server hostname.
 #
-# $api_port::              Icinga 2 API port.
-#
 # $api_cacert::            Path to Icinga2 server CA certificate file.
 #
 # $api_user::              Icinga2 API username.
@@ -18,25 +16,34 @@
 #
 # $api_password::          Icinga2 API password. If set to undef (default) API
 #                          connection is made via certificate and key.
+#                          type:password
 #
 # $verify_ssl::            Whether smart-proxy should verify the ssl connection
 #                          to Icinga2.
+#                          type:boolean
 #
 # === Advanced parameters:
 #
 # $enabled::               Enable this plugin.
 #
 class foreman_proxy::plugin::monitoring::icinga2 (
-  Boolean $enabled = $::foreman_proxy::plugin::monitoring::icinga2::params::enabled,
-  String $server = $::foreman_proxy::plugin::monitoring::icinga2::params::server,
-  Integer[0, 65535] $api_port = $::foreman_proxy::plugin::monitoring::icinga2::params::api_port,
-  Stdlib::Absolutepath $api_cacert = $::foreman_proxy::plugin::monitoring::icinga2::params::api_cacert,
-  String $api_user = $::foreman_proxy::plugin::monitoring::icinga2::params::api_user,
-  Stdlib::Absolutepath $api_usercert = $::foreman_proxy::plugin::monitoring::icinga2::params::api_usercert,
-  Stdlib::Absolutepath $api_userkey = $::foreman_proxy::plugin::monitoring::icinga2::params::api_userkey,
-  Optional[String] $api_password = $::foreman_proxy::plugin::monitoring::icinga2::params::api_password,
-  Boolean $verify_ssl = $::foreman_proxy::plugin::monitoring::icinga2::params::verify_ssl,
+  $enabled = $::foreman_proxy::plugin::monitoring::icinga2::params::enabled,
+  $server = $::foreman_proxy::plugin::monitoring::icinga2::params::server,
+  $api_cacert = $::foreman_proxy::plugin::monitoring::icinga2::params::api_cacert,
+  $api_user = $::foreman_proxy::plugin::monitoring::icinga2::params::api_user,
+  $api_usercert = $::foreman_proxy::plugin::monitoring::icinga2::params::api_usercert,
+  $api_userkey = $::foreman_proxy::plugin::monitoring::icinga2::params::api_userkey,
+  $api_password = $::foreman_proxy::plugin::monitoring::icinga2::params::api_password,
+  $verify_ssl = $::foreman_proxy::plugin::monitoring::icinga2::params::verify_ssl,
 ) inherits foreman_proxy::plugin::monitoring::icinga2::params {
+  validate_bool($enabled)
+  validate_string($server, $api_user, $api_usercert, $api_userkey)
+
+  validate_bool($verify_ssl)
+  if $api_password {
+    validate_string($api_password)
+  }
+
   include ::foreman_proxy::plugin::monitoring
 
   foreman_proxy::settings_file { 'monitoring_icinga2':

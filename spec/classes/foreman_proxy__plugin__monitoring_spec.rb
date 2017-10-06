@@ -29,14 +29,12 @@ describe 'foreman_proxy::plugin::monitoring' do
       "include foreman_proxy"
     end
     let :params do {
-      :providers => ['example1', 'example2'],
-      :collect_status => false,
+      :provider => 'example',
     } end
 
     it 'should change monitoring.yml parameters' do
       should contain_file('/etc/foreman-proxy/settings.d/monitoring.yml').
-        with_content(/:use_provider:\n  - monitoring_example1\n  - monitoring_example2/).
-        with_content(/collect_status: false/)
+        with_content(/:use_provider: monitoring_example/)
     end
   end
 

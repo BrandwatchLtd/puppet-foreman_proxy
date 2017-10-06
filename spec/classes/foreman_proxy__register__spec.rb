@@ -26,36 +26,15 @@ describe 'foreman_proxy::register' do
             'ssl_ca'          => /\A\/.+\.pem\z/,
           })
         end
-
-        it 'should collect features' do
-          should contain_datacat_collector('foreman_proxy::enabled_features').with({
-            'source_key'      => 'features',
-            'target_resource' => "Foreman_smartproxy[#{facts[:fqdn]}]",
-            'target_field'    => 'features',
-          }).that_comes_before("Foreman_smartproxy[#{facts[:fqdn]}]")
-        end
-
-        context 'with datacat provider' do
-          # Use a RAL catalog for resources with providers
-          subject { catalogue.to_ral }
-
-          # Run the datacat provider to populate the foreman_smartproxy resource and check
-          # the resulting collected values (ensures datacat is correctly configured)
-          before { subject.resource('Datacat_collector[foreman_proxy::enabled_features]').provider.exists? }
-
-          it 'should populate features on foreman_smartproxy' do
-            expect(subject.resource("Foreman_smartproxy[#{facts[:fqdn]}]").parameters[:features].should.sort).to match_array(["Logs", "Puppet", "Puppet CA", "TFTP"])
-          end
-        end
       end
 
       describe 'with overrides' do
         let :pre_condition do
           "class {'foreman_proxy':
             register_in_foreman   => true,
-            foreman_base_url      => 'https://foreman.example.com',
+            foreman_base_url      => 'my_base',
             registered_name       => 'my_proxy',
-            registered_proxy_url  => 'https://proxy.example.com:8443',
+            registered_proxy_url  => 'my_url',
             oauth_consumer_key    => 'key',
             oauth_consumer_secret => 'secret',
             oauth_effective_user  => 'smartproxy',
@@ -66,9 +45,9 @@ describe 'foreman_proxy::register' do
           should contain_class('foreman_proxy::register')
           should contain_foreman_smartproxy('my_proxy').with({
             'ensure'          => 'present',
-            'base_url'        => 'https://foreman.example.com',
+            'base_url'        => 'my_base',
             'effective_user'  => 'smartproxy',
-            'url'             => 'https://proxy.example.com:8443',
+            'url'             => 'my_url',
             'consumer_key'    => 'key',
             'consumer_secret' => 'secret',
           })
@@ -79,12 +58,12 @@ describe 'foreman_proxy::register' do
         let :pre_condition do
           "class {'foreman_proxy':
             register_in_foreman   => true,
-            foreman_base_url      => 'https://foreman.example.com',
+            foreman_base_url      => 'my_base',
             registered_name       => 'my_proxy',
             oauth_consumer_key    => 'key',
             oauth_consumer_secret => 'secret',
             oauth_effective_user  => 'smartproxy',
-            ssl_port              => 1234,
+            ssl_port              => '1234',
           }"
         end
 
@@ -92,7 +71,7 @@ describe 'foreman_proxy::register' do
           should contain_class('foreman_proxy::register')
           should contain_foreman_smartproxy('my_proxy').with({
             'ensure'          => 'present',
-            'base_url'        => 'https://foreman.example.com',
+            'base_url'        => 'my_base',
             'effective_user'  => 'smartproxy',
             'url'             => "https://#{facts[:fqdn]}:1234",
             'consumer_key'    => 'key',
@@ -143,7 +122,6 @@ describe 'foreman_proxy::register' do
         it 'should not register the proxy' do
           should contain_class('foreman_proxy::register')
           should_not contain_foreman_smartproxy(facts[:fqdn])
-          should_not contain_datacat_collector('foreman_proxy::enabled_features')
         end
       end
     end

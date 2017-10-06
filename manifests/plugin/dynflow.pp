@@ -4,31 +4,40 @@
 #
 # === Parameters:
 #
-# $database_path::   Path to the SQLite database file, set empty for in-memory sqlite
+# $database_path::   Path to the SQLite database file
+#                    type:Stdlib::Absolutepath
 #
 # $console_auth::    Whether to enable trusted hosts and ssl for the dynflow console
+#                    type:Boolean
 #
 # === Advanced parameters:
 #
 # $enabled::         Enables/disables the dynflow plugin
+#                    type:Boolean
 #
 # $listen_on::       Proxy feature listens on https, http, or both
+#                    type:Foreman_proxy::ListenOn
 #
 # $core_listen::     Address to listen on for the dynflow core service
+#                    type:String
 #
 # $core_port::       Port to use for the local dynflow core service
-#
-# $ssl_disabled_ciphers:: Disable SSL ciphers
+#                    type:Integer[0, 65535]
 #
 class foreman_proxy::plugin::dynflow (
-  Boolean $enabled = $::foreman_proxy::plugin::dynflow::params::enabled,
-  Foreman_proxy::ListenOn $listen_on = $::foreman_proxy::plugin::dynflow::params::listen_on,
-  Optional[Stdlib::Absolutepath] $database_path = $::foreman_proxy::plugin::dynflow::params::database_path,
-  Boolean $console_auth = $::foreman_proxy::plugin::dynflow::params::console_auth,
-  String $core_listen = $::foreman_proxy::plugin::dynflow::params::core_listen,
-  Integer[0, 65535] $core_port = $::foreman_proxy::plugin::dynflow::params::core_port,
-  Optional[Array[String]] $ssl_disabled_ciphers = $::foreman_proxy::plugin::dynflow::params::ssl_disabled_ciphers,
+  $enabled           = $::foreman_proxy::plugin::dynflow::params::enabled,
+  $listen_on         = $::foreman_proxy::plugin::dynflow::params::listen_on,
+  $database_path     = $::foreman_proxy::plugin::dynflow::params::database_path,
+  $console_auth      = $::foreman_proxy::plugin::dynflow::params::console_auth,
+  $core_listen       = $::foreman_proxy::plugin::dynflow::params::core_listen,
+  $core_port         = $::foreman_proxy::plugin::dynflow::params::core_port,
 ) inherits foreman_proxy::plugin::dynflow::params {
+
+  validate_integer($core_port)
+  validate_bool($enabled, $console_auth)
+  validate_listen_on($listen_on)
+  validate_absolute_path($database_path)
+
   if $::foreman_proxy::ssl {
     $core_url = "https://${::fqdn}:${core_port}"
   } else {
@@ -39,7 +48,6 @@ class foreman_proxy::plugin::dynflow (
   }
   -> foreman_proxy::settings_file { 'dynflow':
     enabled       => $enabled,
-    feature       => 'Dynflow',
     listen_on     => $listen_on,
     template_path => 'foreman_proxy/plugin/dynflow.yml.erb',
   }
