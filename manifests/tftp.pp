@@ -1,5 +1,7 @@
 # Set up the tftp component
-class foreman_proxy::tftp {
+class foreman_proxy::tftp(
+  $tftp_replace_grub2_cfg = $::foreman_proxy::tftp_replace_grub2_cfg,
+){
   class { '::tftp':
     root => $foreman_proxy::tftp_root,
   }
@@ -17,6 +19,7 @@ class foreman_proxy::tftp {
     owner   => $foreman_proxy::user,
     mode    => '0644',
     content => template('foreman_proxy/grub.cfg.erb'),
+    replace => $tftp_replace_grub2_cfg,
   }
 
   foreman_proxy::tftp::copy_file { $foreman_proxy::tftp_syslinux_filenames:

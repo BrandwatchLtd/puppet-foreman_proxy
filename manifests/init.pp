@@ -438,6 +438,7 @@ class foreman_proxy (
   $logs                       = $foreman_proxy::params::logs,
   $logs_listen_on             = $foreman_proxy::params::logs_listen_on,
   $tftp                       = $foreman_proxy::params::tftp,
+  $tftp_replace_grub2_cfg     = $foreman_proxy::params::tftp_replace_grub2_cfg,
   $tftp_listen_on             = $foreman_proxy::params::tftp_listen_on,
   $tftp_managed               = $foreman_proxy::params::tftp_managed,
   $tftp_manage_wget           = $foreman_proxy::params::tftp_manage_wget,

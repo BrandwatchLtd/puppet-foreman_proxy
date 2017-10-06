@@ -254,6 +254,7 @@ class foreman_proxy::params {
 
   # TFTP settings - requires optional TFTP puppet module
   $tftp             = true
+  $tftp_replace_grub2_cfg = false
   $tftp_listen_on   = 'https'
   $tftp_managed     = true
   $tftp_manage_wget = true
