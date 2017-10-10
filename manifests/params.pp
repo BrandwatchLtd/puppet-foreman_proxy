@@ -273,6 +273,7 @@ class foreman_proxy::params {
   $dhcp_option_domain      = [$::domain]
   $dhcp_search_domains     = undef
   $dhcp_pxeserver          = undef
+  $dhcp_pxefilename        = 'pxelinux.0'
   $dhcp_network            = undef
   $dhcp_netmask            = undef
   # This will use the IP of the interface in $dhcp_interface, override
